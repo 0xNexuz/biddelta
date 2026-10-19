@@ -1,0 +1,47 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.7.0 -- /workspace/.biddelta-env/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/biddelta/backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 37 items
+
+backend/tests/test_api.py::test_health_does_not_claim_inference_verification PASSED [  2%]
+backend/tests/test_documents.py::test_pdf_spans_match_extracted_page PASSED [  5%]
+backend/tests/test_documents.py::test_file_size_bounds[empty] PASSED     [  8%]
+backend/tests/test_documents.py::test_file_size_bounds[oversize] PASSED  [ 10%]
+backend/tests/test_documents.py::test_invalid_evidence_csv[wrong,header\n] PASSED [ 13%]
+backend/tests/test_documents.py::test_invalid_evidence_csv[evidence_id,status,note\ne,done,n\n] PASSED [ 16%]
+backend/tests/test_documents.py::test_invalid_evidence_csv[evidence_id,status,note\ne,missing,n\ne,asserted,n\n] PASSED [ 18%]
+backend/tests/test_engine.py::test_revision_creation_preserves_original_bytes PASSED [ 21%]
+backend/tests/test_engine.py::test_dependent_approval_expires_and_unaffected_waits_for_scope PASSED [ 24%]
+backend/tests/test_engine.py::test_missing_impact_blocks_scope_approval_and_export PASSED [ 27%]
+backend/tests/test_engine.py::test_stale_approval_request_rejected PASSED [ 29%]
+backend/tests/test_engine.py::test_known_dependency_cannot_be_reviewed_as_no_impact PASSED [ 32%]
+backend/tests/test_engine.py::test_zero_change_amendment_still_requires_scope_confirmation PASSED [ 35%]
+backend/tests/test_engine.py::test_audit_and_reviews_survive_reopen_and_sql_updates_rejected PASSED [ 37%]
+backend/tests/test_engine.py::test_unresolved_evidence_prevents_completion[missing] PASSED [ 40%]
+backend/tests/test_engine.py::test_unresolved_evidence_prevents_completion[conflict] PASSED [ 43%]
+backend/tests/test_engine.py::test_evidence_revisions_preserve_history_and_require_recheck PASSED [ 45%]
+backend/tests/test_engine.py::test_second_amendment_cannot_restore_earlier_stale_approval PASSED [ 48%]
+backend/tests/test_engine.py::test_source_version_chain_preserved PASSED [ 51%]
+backend/tests/test_engine.py::test_invalid_mutation_rolls_back_bytes_and_revision PASSED [ 54%]
+backend/tests/test_engine.py::test_foreign_owner_rejected PASSED         [ 56%]
+backend/tests/test_engine.py::test_extraction_gap_is_never_complete PASSED [ 59%]
+backend/tests/test_engine.py::test_forged_source_span_rejected PASSED    [ 62%]
+backend/tests/test_engine.py::test_duplicate_review_cannot_rewrite_history PASSED [ 64%]
+backend/tests/test_engine.py::test_packet_file_bounds_enforced PASSED    [ 67%]
+backend/tests/test_engine.py::test_duplicate_span_cannot_alias_historical_source PASSED [ 70%]
+backend/tests/test_engine.py::test_evidence_revision_cannot_point_at_csv_header PASSED [ 72%]
+backend/tests/test_nemotron.py::test_disabled_adapter_never_sends_request PASSED [ 75%]
+backend/tests/test_nemotron.py::test_missing_credentials_rejected_before_request PASSED [ 78%]
+backend/tests/test_nemotron.py::test_synthetic_request_format_and_source_validation PASSED [ 81%]
+backend/tests/test_nemotron.py::test_unsafe_or_malformed_synthetic_outputs_rejected[truncated] PASSED [ 83%]
+backend/tests/test_nemotron.py::test_unsafe_or_malformed_synthetic_outputs_rejected[refusal] PASSED [ 86%]
+backend/tests/test_nemotron.py::test_unsafe_or_malformed_synthetic_outputs_rejected[bad-source] PASSED [ 89%]
+backend/tests/test_nemotron.py::test_unsafe_or_malformed_synthetic_outputs_rejected[bad-dependency] PASSED [ 91%]
+backend/tests/test_nemotron.py::test_unsafe_or_malformed_synthetic_outputs_rejected[authority-field] PASSED [ 94%]
+backend/tests/test_nemotron.py::test_unsafe_or_malformed_synthetic_outputs_rejected[empty-choices] PASSED [ 97%]
+backend/tests/test_nemotron.py::test_provider_failure_has_no_retry PASSED [100%]
+
+============================== 37 passed in 0.71s ==============================

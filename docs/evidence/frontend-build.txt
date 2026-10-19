@@ -1,0 +1,14 @@
+
+> biddelta-frontend@0.1.0 build
+> tsc --noEmit && vite build
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 15 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.34 kB │ gzip:  0.25 kB
+dist/assets/index-CoRg8rJr.css    0.45 kB │ gzip:  0.29 kB
+dist/assets/index-DXlCxPOJ.js   220.12 kB │ gzip: 68.87 kB
+
+✓ built in 238ms

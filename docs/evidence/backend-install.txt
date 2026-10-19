@@ -1,0 +1,20 @@
+Obtaining file:///workspace/biddelta/backend
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: biddelta
+  Building editable for biddelta (pyproject.toml): started
+  Building editable for biddelta (pyproject.toml): finished with status 'done'
+  Created wheel for biddelta: filename=biddelta-0.1.0-0.editable-py3-none-any.whl size=2787 sha256=0d099b5ea445d86f6f7e4c4bc94cf172af99afb7e7aec2f85b2e225997ad9a1f
+  Stored in directory: /tmp/pip-ephem-wheel-cache-ju6j3cv4/wheels/44/29/43/5d24b1528b5627a72b1e84ec143cd0b5dd4e96c6adfc84a73d
+Successfully built biddelta
+Installing collected packages: biddelta
+Successfully installed biddelta-0.1.0
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: python -m pip install --upgrade pip
