@@ -2,8 +2,10 @@
 
 ## Identity and authority
 Updated: 2026-10-19. Project: BidDelta. Repository: 0xNexuz/biddelta.
-Stage: DEVELOPMENT. Current authorized milestone: P0-A — Foundation and Core
-Mechanism. User approved development in the initialization request. Discovery,
+Stage: DEVELOPMENT. Current authorization: P0-B slice 1 — offline document upload
+and packet review. P0-A deterministic foundation is preserved on GitHub at
+66a5192cdeb3d5f923a3ec949d6e90388f09dd15 (PR #1). Its real Nemotron check remains
+unverified. P0-B branch: feat/biddelta-p0b-packet-review, based on that exact commit. Discovery,
 Strategy and Planning were completed separately in 0xNexuz/mags-skills and are not
 repeated here. This file preserves the supplied planning handoff; project-specific
 context belongs in this application repository. Read AGENTS.md before changes.
@@ -51,7 +53,8 @@ notes, selective approval expiration, recheck and reviewed export.
 Excluded: OCR, drawings, arbitrary spreadsheets, automatic proposal generation,
 legal conclusions, automatic PDF editing, universal portal monitoring, procurement
 submission, payments, enterprise collaboration, production deployment, Tavily,
-final submission packaging. Do not expand into P0-B or run a full Build Harness audit.
+final submission packaging. Do not expand beyond the authorized P0-B slice or run
+a full Build Harness audit.
 
 ## Technical architecture — PLANNED overall
 React/TypeScript frontend; FastAPI API; bounded Python worker; PyMuPDF/CSV
@@ -81,8 +84,11 @@ untrusted; source references must be validated. Require ownership checks, bounde
 retries, safe rendering, file limits, and SSRF controls if retrieval is enabled.
 Private hosted uploads require a later security/retention review. Host/operator and
 inference provider remain trusted for data handling. P0-A's service actor is supplied
-by trusted local Python code; it is not web authentication. No upload/review HTTP
-workflow or public hosting is implemented.
+by trusted local Python code; it is not web authentication. P0-B adds a loopback-only HTTP upload/review workflow with opaque HttpOnly,
+SameSite=Strict session cookies, server-bound owner identity, trusted host/origin
+checks, a custom write-request header, bounded request bodies and private local
+SQLite storage. No public hosting is implemented. Sessions are in memory and do
+not survive backend restart; persistent session recovery remains unimplemented.
 
 ## Testing strategy — PLANNED application acceptance
 Prove real Nebius inference, scoped impacts, missing-evidence blocking,
@@ -104,10 +110,11 @@ products already cover amendment workflows. Small evaluation cannot establish
 production reliability. Explicit scope confirmation is a human attestation of
 inventory completeness, not a deterministic proof that no semantic change was missed.
 
-## Milestones — approved P0-A only
+## Milestones — P0-A foundation and bounded P0-B slice authorized
 - P0-A: repository context, packet contract, revision/approval engine, targeted tests,
   and one real Nemotron capability check (metered check requires separate approval).
-- P0-B: complete real end-to-end review journey — PLANNED, not authorized here.
+- P0-B: first offline upload/review slice AUTHORIZED and implemented; complete
+  real end-to-end review journey remains PLANNED.
 - P0-C: critical trust controls and qualification requirements — PLANNED.
 - P1: recovery, adversarial evaluation, evidence and judge packaging — PLANNED.
 - P2: reusable primitives and optional Tavily retrieval — PLANNED.
@@ -138,6 +145,25 @@ Reserve final two days for verification/submission preparation.
   or P0-B development is authorized. Existing executed test evidence is retained;
   comprehensive tests are not repeated for this preservation-only task.
 
+- 2026-10-19 APPROVED: first bounded P0-B phase, upload and packet review through
+  the frontend/API, with offline synthetic fixtures, no real provider calls, no API
+  key, targeted tests only, and no push/merge/deployment/spending. Builder Program
+  approval is pending. This supersedes earlier "no P0-B" authorization status.
+- 2026-10-19 IMPLEMENTATION DECISION: page candidates and user-selected dependency
+  mappings provide a manual workflow without simulated semantic inference.
+  Original sources and the deterministic engine remain authoritative. JSON/base64
+  upload transport avoids an added multipart dependency; both decoded files and
+  total HTTP bodies are bounded. Request size cap is 72 MiB including base64.
+- 2026-10-19 IMPLEMENTATION DECISION: one packet snapshot supplies both the UI packet
+  and export gate so their revisions cannot disagree. Existing gate logic is shared,
+  not reimplemented in the frontend. Local session ownership is server-generated.
+
+- 2026-10-19 APPROVED: preserve completed P0-B slice 1 on
+  feat/biddelta-p0b-packet-review by committing, pushing and opening a stacked PR
+  against feat/biddelta-p0-foundation. Preserve existing evidence without rerunning
+  comprehensive tests. No merge of either PR, new milestone, deployment or paid
+  inference is authorized. This supersedes the prior local-only preservation limit.
+
 ## Implementation and verification evidence
 IMPLEMENTED: AGENTS.md and authoritative context; React/TypeScript status scaffold;
 FastAPI health route; typed packet/domain contracts; bounded PyMuPDF and CSV helpers;
@@ -160,22 +186,42 @@ inspected. Candidate model IDs and limitations are recorded with URLs in
 docs/TOKEN_FACTORY.md. Account-visible availability and exact schema acceptance
 remain UNVERIFIED. No model-generated inference results exist.
 
-PLANNED/UNVERIFIED: bounded worker runtime, full upload/review workflow, replacement
-response corrections, downloadable/reproducible export artifacts, hosted isolation,
-real inference, public packet selection and held-out evaluation. Architecture is
-still PLANNED overall. P0-A status: deterministic foundation delivered; remaining
-real Nemotron check BLOCKED, so the entire milestone is not marked complete.
+## P0-B slice 1 — implemented and verified
+IMPLEMENTED: initial PDF/CSV upload and preview, exact quoted CSV evidence IDs,
+manual tender/response page mappings, packet persistence, amendment source upload
+and human change inventory, impact review, complete-scope confirmation, item
+approvals, deterministic gate visibility and decision history. React uses a same-
+origin Vite proxy to the FastAPI local API. Server ownership, origin/host checks,
+body limits and private DB permissions are applied. Explicit synthetic fixture
+files are generated offline, with no mock inference result presented as real.
 
-## Current blockers and next action
-No configured Token Factory secret or runtime credential was reported by the
-managed environment on 2026-10-19. No metered call authorized. Account model
-availability, credits, eligibility and real inference remain unverified.
-Stop after this P0-A implementation. Exact next action: configure a server-side
-Token Factory key and allowed provider egress, verify account/project/credits and
-list account-visible Nemotron models, then obtain explicit approval for one bounded
-metered structured-output capability check. Record its real receipt or adverse
-result before declaring P0-A complete. Next development milestone P0-B remains
-planned and requires separate authorization.
+VERIFIED: 18 focused tests passed in 0.75s (13 current API cases and five selected
+engine regression cases; 15 unrelated engine tests deselected). A Chromium browser
+check exercised browser → Vite proxy → API → SQLite → UI, including a reopened page
+retaining reviewed revision 2. It demonstrated scoped approval carry-forward and
+fresh review for the stale dependent item. No browser errors, external/provider
+requests or mobile horizontal overflow were observed. TypeScript checking and
+Vite build passed in 126ms. See docs/evidence/P0B_SLICE_1.md and raw logs. The prior
+37-test P0-A result remains historical evidence, not a new full-suite result.
+
+PLANNED/UNVERIFIED: semantic analysis, bounded worker runtime, correction/recheck UI,
+evidence correction UI, persistent session recovery after backend restart,
+downloadable/reproducible exports, hosted isolation, real inference, public packet
+selection and held-out evaluation. Full architecture and P0-B remain incomplete.
+
+## Current blockers and next phase
+Nebius Builder Program approval is pending. Token Factory credentials, account-
+visible model/credits and exact model structured-output capability remain
+unverified. Real inference is prohibited in this slice and unnecessary for offline
+verification. No provider call or API credit spend occurred.
+
+The authorized development slice is complete. Current work is preservation only:
+commit/push the existing P0-B branch and open the authorized stacked PR, then stop.
+Recommended next bounded development phase: offline evidence correction and
+response correction/recheck, followed by a reproducible reviewed export. Obtain
+further authorization before starting that phase or pushing/merging/deploying.
+The independent real Nemotron capability check still requires appropriate account
+access, provider egress and explicit metered-call approval when authorized.
 
 ## Research sources reused from handoff
 - https://devpost.com/software/accesspatch

@@ -217,7 +217,10 @@ class Engine:
         return p
 
     def gate(self, packet_id, actor) -> ExportGate:
-        p = self.store.get(packet_id, actor)
+        return self.gate_for_packet(self.store.get(packet_id, actor))
+
+    @staticmethod
+    def gate_for_packet(p: Packet) -> ExportGate:
         blockers = []
         if p.scope_confirmed_revision != p.revision:
             blockers.append("scope_confirmation_required")
@@ -225,7 +228,7 @@ class Engine:
             blockers.append("missing_impact_review")
         if any(d.extraction_gaps for d in p.documents):
             blockers.append("extraction_gaps")
-        blockers.extend(f"unresolved_evidence:{e}" for e in self._unresolved(p))
+        blockers.extend(f"unresolved_evidence:{e}" for e in Engine._unresolved(p))
         blockers.extend(f"approval_required:{i.id}" for i in p.items
                         if i.approval_state != ApprovalState.APPROVED or i.approved_revision != p.revision)
         return ExportGate(packet_id=p.id, revision=p.revision, allowed=not blockers, blockers=blockers)

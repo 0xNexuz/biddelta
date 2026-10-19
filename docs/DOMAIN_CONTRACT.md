@@ -1,4 +1,6 @@
-# P0-A domain contract and limits
+# Domain contract and limits
+
+## Original P0-A service contract
 
 The executable contracts are in backend/biddelta/models.py. This is a local Python
 service foundation, with no exposed HTTP mutation endpoints. The only HTTP route
@@ -57,3 +59,18 @@ and sources. This protects normal application operations, not a hostile database
 administrator. Database files need private filesystem permissions. Snapshot growth,
 malicious PDF resource limits, encryption, retention and hosted isolation require
 later work. No multi-user security or production reliability is asserted.
+
+## P0-B slice 1 API boundary
+
+The original service contract above is retained; HTTP exposure has expanded beyond
+health. See README.md and docs/evidence/P0B_SLICE_1.md for the current workflow.
+New workflow.py upload contracts map manually reviewed page candidates into the
+existing engine, without semantic inference. api.py binds owner identity to an
+opaque browser session. Human scope, impact and approval decisions reach the same
+engine methods; the frontend cannot directly set approval state or gate status.
+
+A gate_for_packet helper evaluates the existing gate rules against one immutable
+loaded snapshot. Packet and gate returned to the frontend therefore share a
+revision even if another request writes a new snapshot concurrently. No original
+P0-A invariant has been relaxed. Evidence correction and response text updates
+are not exposed through the new API in this slice.
