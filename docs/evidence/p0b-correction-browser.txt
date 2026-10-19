@@ -1,0 +1,2 @@
+PASS: existing upload and amendment journey; evidence missing -> scope -> approval blocked -> asserted correction -> scope -> fresh approval -> gate open -> reload revision 4. Evidence history/source retained; no auto approval.
+PASS: mobile layout has no horizontal overflow; no browser runtime errors or external/provider requests.
