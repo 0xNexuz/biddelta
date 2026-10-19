@@ -1,0 +1,2 @@
+PASS: browser upload/preview -> manual mappings -> initial approvals -> amendment -> selective staleness -> impact -> scope -> fresh approval -> gate open -> reload retained.
+PASS: mobile layout has no horizontal overflow; no browser runtime errors or external/provider requests.
