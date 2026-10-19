@@ -10,7 +10,7 @@ from .engine import Engine
 from .store import Store
 from .fixtures import fixture
 from .workflow import (Amendment, CreatePacket, Decision, ImpactDecision, Preview,
-                       add_amendment, create_packet)
+                       EvidenceCorrection, add_amendment, correct_evidence, create_packet)
 
 MAX_BODY = 72 * 1024 * 1024  # Base64 expansion of bounded packet + metadata.
 ORIGINS = {f'http://{host}:{port}' for host in ('127.0.0.1', 'localhost') for port in (5173, 8000)}
@@ -121,6 +121,11 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
     @app.post('/api/packets/{packet_id}/changes/{change_id}/impact')
     def impact(packet_id: str, change_id: str, body: ImpactDecision, actor=Depends(owner)):
         engine.review_impact(packet_id, actor, body.expected_revision, change_id, body.affected_item_ids, body.rationale)
+        return view(packet_id, actor)
+
+    @app.post('/api/packets/{packet_id}/evidence-revisions')
+    def evidence_correction(packet_id: str, body: EvidenceCorrection, actor=Depends(owner)):
+        correct_evidence(engine, packet_id, actor, body)
         return view(packet_id, actor)
 
     @app.post('/api/packets/{packet_id}/scope')

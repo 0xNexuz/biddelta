@@ -74,3 +74,21 @@ loaded snapshot. Packet and gate returned to the frontend therefore share a
 revision even if another request writes a new snapshot concurrently. No original
 P0-A invariant has been relaxed. Evidence correction and response text updates
 are not exposed through the new API in this slice.
+
+## P0-B phase 2 correction/recheck
+
+POST /api/packets/{packet_id}/evidence-revisions accepts expected_revision,
+evidence_id, explicit missing/conflict/asserted status, a nonblank correction note
+and rationale. Session ownership is required; arbitrary actor/source fields are
+rejected. Source span comes from that evidence's server-side history. Existing
+Engine.revise_evidence serializes writes and rejects stale packet revisions.
+
+Every correction creates a new packet and evidence revision, retains original bytes,
+source link, prior decisions and audit history, marks dependent items stale, and
+requires scope confirmation. An asserted correction is an owner assertion rather
+than authenticated evidence or approval. Unaffected approved items may only carry
+forward through scope confirmation; dependent items require fresh owner review.
+Missing/conflicting latest evidence blocks linked approval and reviewed completion.
+The frontend shows latest status and full evidence revision history separately.
+This extends the original P0-B API boundary; replacement PDFs, new register uploads
+and downloadable exports remain unimplemented.

@@ -5,7 +5,8 @@ export interface Doc { id: string; kind: Kind; spans: Span[]; extraction_gaps: n
 export interface Requirement { id: string; text: string; source_span_ids: string[] }
 export interface Item { id: string; text: string; source_span_ids: string[]; requirement_ids: string[]; evidence_ids: string[]; approval_state: string; approved_revision: number | null }
 export interface Change { id: string; source_span_id: string; description: string; requirement_ids: string[]; reviewed: boolean }
-export interface Packet { id: string; revision: number; scope_confirmed_revision: number; documents: Doc[]; requirements: Requirement[]; items: Item[]; changes: Change[]; evidence: { evidence_id: string; status: string; note: string }[]; decisions: { id: string; action: string; target_id: string; revision: number; rationale: string }[] }
+export interface Evidence { id: string; evidence_id: string; revision: number; source_span_id: string; status: 'missing' | 'conflict' | 'asserted'; note: string }
+export interface Packet { id: string; revision: number; scope_confirmed_revision: number; documents: Doc[]; requirements: Requirement[]; items: Item[]; changes: Change[]; evidence: Evidence[]; decisions: { id: string; action: string; target_id: string; revision: number; rationale: string }[] }
 export interface Review { packet: Packet; gate: { allowed: boolean; blockers: string[]; disclaimer: string }; analysis_mode: string }
 export interface Mapping { page: number; requirement_pages: number[]; evidence_ids: string[] }
 export interface Draft { page: number; description: string; requirement_ids: string[] }

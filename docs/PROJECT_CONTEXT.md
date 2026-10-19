@@ -2,10 +2,13 @@
 
 ## Identity and authority
 Updated: 2026-10-19. Project: BidDelta. Repository: 0xNexuz/biddelta.
-Stage: DEVELOPMENT. Current authorization: P0-B slice 1 — offline document upload
-and packet review. P0-A deterministic foundation is preserved on GitHub at
+Stage: DEVELOPMENT. Current authorization: P0-B phase 2 — offline evidence correction
+and recheck, including feature-branch preservation and PR. P0-A deterministic foundation is preserved on GitHub at
 66a5192cdeb3d5f923a3ec949d6e90388f09dd15 (PR #1). Its real Nemotron check remains
-unverified. P0-B branch: feat/biddelta-p0b-packet-review, based on that exact commit. Discovery,
+unverified. PR #1 is merged into main; PR #2 is merged into
+feat/biddelta-p0-foundation at 857e6592f4af5da73da69867454834e3ee2284ae.
+Phase 2 branch: feat/biddelta-p0b-correction-recheck, based on that merged P0-B commit.
+Discovery,
 Strategy and Planning were completed separately in 0xNexuz/mags-skills and are not
 repeated here. This file preserves the supplied planning handoff; project-specific
 context belongs in this application repository. Read AGENTS.md before changes.
@@ -164,6 +167,19 @@ Reserve final two days for verification/submission preparation.
   comprehensive tests. No merge of either PR, new milestone, deployment or paid
   inference is authorized. This supersedes the prior local-only preservation limit.
 
+- 2026-10-19 APPROVED: P0-B phase 2 evidence correction/recheck; preserve existing
+  upload/amendment behavior and deterministic rules. After targeted verification,
+  commit and push only feat/biddelta-p0b-correction-recheck and open a PR against
+  feat/biddelta-p0-foundation. No automatic merge, export implementation,
+  response-PDF replacement, public hosting, deployment or paid inference.
+- 2026-10-19 VERIFIED: fetched branch history confirms merged PR #1 on main and
+  merged PR #2 on feat/biddelta-p0-foundation. Clean working tree; phase 2 branched
+  from 857e6592f4af5da73da69867454834e3ee2284ae, retaining existing P0-B work.
+- 2026-10-19 IMPLEMENTATION DECISION: correction API derives source reference from
+  server-owned evidence history and delegates to the existing atomic engine method.
+  Status/note/rationale are explicit owner assertions; correction does not authorize
+  approvals. No domain/schema/dependency change was required.
+
 ## Implementation and verification evidence
 IMPLEMENTED: AGENTS.md and authoritative context; React/TypeScript status scaffold;
 FastAPI health route; typed packet/domain contracts; bounded PyMuPDF and CSV helpers;
@@ -204,24 +220,39 @@ requests or mobile horizontal overflow were observed. TypeScript checking and
 Vite build passed in 126ms. See docs/evidence/P0B_SLICE_1.md and raw logs. The prior
 37-test P0-A result remains historical evidence, not a new full-suite result.
 
-PLANNED/UNVERIFIED: semantic analysis, bounded worker runtime, correction/recheck UI,
-evidence correction UI, persistent session recovery after backend restart,
+## P0-B phase 2 — implemented and verified
+IMPLEMENTED: owner-bound evidence correction API and frontend form; latest evidence
+status, historical revisions and original source display; dependent recheck guidance;
+clear gate blockers and separate scope/fresh approval. Existing engine transaction
+and all source/history invariants retained. No automatic approval or model calls.
+
+VERIFIED: 13 targeted tests passed in 1.14s, covering corrections, history/source
+bytes, staleness, ownership, competing edits, fresh approval and unresolved blocking,
+plus existing upload/amendment and evidence-engine regressions. Final TypeScript/
+Vite build passed in 185ms. One successful Chromium walkthrough followed a fix to
+the new status field label; it exercised the existing upload/amendment journey plus
+correction/recheck, persisted revision 4 after reload, and observed no external calls,
+runtime errors or horizontal mobile overflow. Raw results and limits are in
+docs/evidence/P0B_CORRECTION_RECHECK.md. No comprehensive suite was rerun.
+
+PLANNED/UNVERIFIED: semantic analysis, bounded worker runtime,
+persistent session recovery after backend restart,
 downloadable/reproducible exports, hosted isolation, real inference, public packet
 selection and held-out evaluation. Full architecture and P0-B remain incomplete.
 
 ## Current blockers and next phase
-Nebius Builder Program approval is pending. Token Factory credentials, account-
-visible model/credits and exact model structured-output capability remain
-unverified. Real inference is prohibited in this slice and unnecessary for offline
-verification. No provider call or API credit spend occurred.
+User-reported account onboarding blocker: Nigeria is unavailable in Nebius's
+billing-country list. Recorded from user context; not independently tested via a
+billing/account request. Builder Program review and promotional credits remain
+pending. Token Factory credentials, account-visible models/credits and exact
+structured-output capability remain unverified. No real inference or paid requests
+occurred; offline tests require no API key.
 
-The authorized development slice is complete. Current work is preservation only:
-commit/push the existing P0-B branch and open the authorized stacked PR, then stop.
-Recommended next bounded development phase: offline evidence correction and
-response correction/recheck, followed by a reproducible reviewed export. Obtain
-further authorization before starting that phase or pushing/merging/deploying.
-The independent real Nemotron capability check still requires appropriate account
-access, provider egress and explicit metered-call approval when authorized.
+Correction/recheck slice is complete; preserve only the authorized feature branch
+and PR against feat/biddelta-p0-foundation, then stop. Recommended next bounded
+slice: persistent local-session recovery, followed by reproducible reviewed export.
+Response-PDF replacement, exports, hosted security and full evaluation are not
+implemented here. No next-phase implementation or automatic merge is authorized.
 
 ## Research sources reused from handoff
 - https://devpost.com/software/accesspatch

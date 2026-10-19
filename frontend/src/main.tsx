@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { api, upload, type Doc, type Draft, type Kind, type Mapping, type Review, type Upload } from './api';
+import { api, upload, type Evidence, type Doc, type Draft, type Kind, type Mapping, type Review, type Upload } from './api';
 import './style.css';
 
 const kinds: Kind[] = ['tender', 'response', 'evidence_register'];
@@ -16,6 +16,7 @@ function App() {
   const [drafts, setDrafts] = useState<Draft[]>([]), [noChanges, setNoChanges] = useState(false);
   const [rationale, setRationale] = useState(''), [impacts, setImpacts] = useState<Record<string, string[]>>({});
   const [synthetic, setSynthetic] = useState(false);
+  const [correction, setCorrection] = useState<{ evidence_id: string; status: Evidence['status'] | ''; note: string; rationale: string } | null>(null);
   async function run(task: () => Promise<void>) {
     setBusy(true); setError('');
     try { await task(); } catch (e) { setError(e instanceof Error ? e.message : 'Request failed.'); }
@@ -23,7 +24,7 @@ function App() {
   }
   function accept(next: Review) {
     setReview(next); localStorage.setItem('biddelta-packet', next.packet.id);
-    setRationale(''); setImpacts({});
+    setRationale(''); setImpacts({}); setCorrection(null);
   }
   useEffect(() => { void run(async () => {
     await api('/session', {}); setReady(true);
@@ -47,6 +48,19 @@ function App() {
     setDrafts(documents[0].spans.map(s => ({ page: s.page, description: s.quote, requirement_ids: review!.packet.requirements.map(r => r.id) })));
   }
   const packet = review?.packet;
+  const latestEvidence = packet ? [...new Map(packet.evidence.map(e => [e.evidence_id, e])).values()] : [];
+  const unresolved = (ids: string[]) => latestEvidence.filter(e => ids.includes(e.evidence_id) && e.status !== 'asserted');
+  function blockerText(code: string) {
+    if (code === 'scope_confirmation_required') return 'Complete scope confirmation is required for this revision.';
+    if (code === 'missing_impact_review') return 'Amendment impact review is incomplete.';
+    if (code === 'extraction_gaps') return 'Unreadable source pages remain unresolved.';
+    if (code.startsWith('unresolved_evidence:')) {
+      const id = code.slice('unresolved_evidence:'.length);
+      return `Evidence ${id} is ${latestEvidence.find(e => e.evidence_id === id)?.status ?? 'unresolved'}; correct the assertion before completing review.`;
+    }
+    if (code.startsWith('approval_required:')) return `Response ${code.slice('approval_required:'.length)} needs scope confirmation or fresh approval.`;
+    return code;
+  }
   const span = (id: string) => packet?.documents.flatMap(d => d.spans).find(s => s.id === id);
   const hasGaps = prepared?.documents.some(d => d.extraction_gaps.length);
   const evidence = prepared?.evidence_ids ?? [];
@@ -92,7 +106,7 @@ function App() {
     {packet && review && <>
       <section><div className="row"><h2>Packet · revision {packet.revision}</h2><button disabled={busy} onClick={() => void run(async () => accept(await api<Review>(`/packets/${packet.id}`)))}>Refresh packet</button></div>
         <p className={review.gate.allowed ? 'notice' : 'blocked'} role="status">{review.gate.allowed ? 'Reviewed gate open' : 'Reviewed gate blocked'}</p>
-        <ul>{review.gate.blockers.map(b => <li key={b}>{b.replaceAll('_', ' ')}</li>)}</ul>
+        <ul>{review.gate.blockers.map(b => <li key={b}>{blockerText(b)}</li>)}</ul>
         <p>{review.gate.disclaimer} Downloadable export is not available in this slice.</p>
         <label>Review rationale<textarea value={rationale} onChange={e => setRationale(e.target.value)} maxLength={4000} placeholder="Record what you checked and why." /></label>
         <fieldset disabled={busy || !rationale.trim()}><legend>Scope review</legend><p>Confirm only after checking the complete source inventory, all response scope, and all changes. This carries unaffected approvals forward; affected items need fresh review.</p>
@@ -100,8 +114,10 @@ function App() {
         </fieldset>
       </section>
       <section><h2>Response items</h2>{packet.items.map(item => <article key={item.id}><h3>{item.id} · {item.approval_state.replaceAll('_', ' ')}</h3><pre>{item.text}</pre><p>Requirements: {item.requirement_ids.join(', ')} · Evidence: {item.evidence_ids.join(', ') || 'none linked'}</p>
+        {item.approval_state === 'stale' && <p>Recheck this response against the current evidence and source text, then record a fresh approval after scope confirmation.</p>}
+        {unresolved(item.evidence_ids).map(e => <p className="blocked" key={e.id}>Approval blocked: evidence {e.evidence_id} is {e.status}.</p>)}
         <details><summary>Response source</summary>{item.source_span_ids.map(id => <pre key={id}>{span(id)?.quote}</pre>)}</details>
-        <button disabled={busy || !rationale.trim() || packet.scope_confirmed_revision !== packet.revision || packet.changes.some(c => !c.reviewed) || item.approval_state === 'approved'} onClick={() => void run(() => decide(`/items/${item.id}/approve`))}>Approve {item.id} at revision {packet.revision}</button>
+        <button disabled={busy || !rationale.trim() || packet.scope_confirmed_revision !== packet.revision || packet.changes.some(c => !c.reviewed) || item.approval_state === 'approved' || unresolved(item.evidence_ids).length > 0} onClick={() => void run(() => decide(`/items/${item.id}/approve`))}>Approve {item.id} at revision {packet.revision}</button>
       </article>)}</section>
       <section><h2>Changes and impact review</h2>{packet.changes.length === 0 && <p>No amendment changes recorded. Scope review still requires a complete inventory check.</p>}
       {packet.changes.map(c => {
@@ -126,7 +142,21 @@ function App() {
         </>}
       </fieldset></section>
       <section><h2>Source inventory and evidence</h2>{packet.documents.map(d => <details key={d.id}><summary>{names[d.kind]} · {d.id.slice(0, 8)}{d.extraction_gaps.length > 0 ? ' · extraction gaps' : ''}</summary><p>SHA-256: {d.sha256}</p>{d.spans.map(s => <pre key={s.id}>Page/record {s.page}: {s.quote}</pre>)}</details>)}
-        {packet.evidence.map(e => <p key={e.evidence_id}>{e.evidence_id} · {e.status} · {e.note}</p>)}
+        <h3>Evidence corrections and recheck</h3>
+        <p>Statuses are owner assertions, not authenticated facts. Saving a correction creates a revision, invalidates dependent approvals, and requires scope confirmation and fresh response review. Original CSV bytes are retained.</p>
+        {latestEvidence.map(e => <article key={e.id}><h4>{e.evidence_id} · evidence revision {e.revision} · {e.status}</h4><p>{e.note}</p>
+          <p>Dependent responses: {packet.items.filter(i => i.evidence_ids.includes(e.evidence_id)).map(i => i.id).join(', ') || 'none linked'}</p>
+          <details><summary>Original evidence source · CSV record {span(e.source_span_id)?.page}</summary><pre>{span(e.source_span_id)?.quote}</pre><p>Source reference: {e.source_span_id}</p></details>
+          <details><summary>Evidence history for {e.evidence_id}</summary>{packet.evidence.filter(h => h.evidence_id === e.evidence_id).map(h => <p key={h.id}>Evidence revision {h.revision} · {h.status}: {h.note} · source {h.source_span_id}</p>)}</details>
+          <button disabled={busy} onClick={() => setCorrection({ evidence_id: e.evidence_id, status: '', note: '', rationale: '' })}>Correct {e.evidence_id}</button>
+          {correction?.evidence_id === e.evidence_id && <fieldset disabled={busy}><legend>Correction for {e.evidence_id} at packet revision {packet.revision}</legend>
+            <label htmlFor="evidence-status">New evidence status</label><select id="evidence-status" value={correction.status} onChange={event => setCorrection({ ...correction, status: event.target.value as Evidence['status'] | '' })}><option value="">Choose explicitly</option><option value="missing">Missing</option><option value="conflict">Conflict</option><option value="asserted">Asserted by owner</option></select>
+            <label>Correction note<textarea value={correction.note} maxLength={4000} onChange={event => setCorrection({ ...correction, note: event.target.value })} /></label>
+            <label>Evidence correction rationale<textarea value={correction.rationale} maxLength={4000} onChange={event => setCorrection({ ...correction, rationale: event.target.value })} /></label>
+            <button disabled={!correction.status || !correction.note.trim() || !correction.rationale.trim()} onClick={() => void run(async () => accept(await api<Review>(`/packets/${packet.id}/evidence-revisions`, { ...correction, note: correction.note.trim(), rationale: correction.rationale.trim(), expected_revision: packet.revision })))}>Save evidence revision</button>
+            <button onClick={() => setCorrection(null)}>Cancel correction</button>
+          </fieldset>}
+        </article>)}
       </section>
       <section><h2>Review history</h2>{packet.decisions.map(d => <p key={d.id}>Revision {d.revision} · {d.action} · {d.target_id}: {d.rationale}</p>)}</section>
       <button disabled={busy} onClick={() => { localStorage.removeItem('biddelta-packet'); setReview(null); setPrepared(null); setAmendment(null); setFiles({}); setSynthetic(false); setError(''); }}>Start another packet (history retained)</button>

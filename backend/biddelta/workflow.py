@@ -90,3 +90,20 @@ def add_amendment(engine, packet_id, actor, body):
     changes = [dict(source_span_id=spans[c.page], description=c.description,
                     requirement_ids=c.requirement_ids) for c in body.changes]
     return engine.amend(packet_id, actor, body.expected_revision, doc, content, changes)
+
+
+class EvidenceCorrection(Decision):
+    evidence_id: str = Field(min_length=1, max_length=1000)
+    status: Literal['missing', 'conflict', 'asserted']
+    note: str = Field(min_length=1, max_length=4000, pattern=r'\S')
+
+
+def correct_evidence(engine, packet_id, actor, body):
+    packet = engine.store.get(packet_id, actor)
+    evidence = next((e for e in reversed(packet.evidence) if e.evidence_id == body.evidence_id), None)
+    if evidence is None:
+        raise ValueError('Unknown evidence identity')
+    # Owner/source binding is server-side. Atomic revision check stays in the engine.
+    return engine.revise_evidence(packet_id, actor, body.expected_revision,
+                                  evidence.evidence_id, body.status, body.note,
+                                  evidence.source_span_id, body.rationale)

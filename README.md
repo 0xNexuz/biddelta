@@ -1,7 +1,7 @@
 # BidDelta
 
 Trace tender amendments into response items, evidence and approval decisions.
-P0-B slice 1 provides an offline, local-owner upload and review workflow. The full
+P0-B provides offline, local-owner upload, review and evidence correction/recheck. The full
 application architecture and real Nemotron integration remain incomplete.
 
 Read [project context](docs/PROJECT_CONTEXT.md) and [agent instructions](AGENTS.md).
@@ -46,6 +46,12 @@ Production hosting and public uploads are not supported.
 5. Record the amendment. Review each change's affected/unaffected response scope,
    confirm complete scope, and freshly approve affected items. The backend decides
    when the reviewed gate opens. Earlier review decisions remain in history.
+6. Under evidence, choose Correct, explicitly select missing/conflict/asserted, and
+   record a correction note and rationale. Saving creates a new evidence/packet
+   revision and expires dependent approvals. Inspect history and original CSV source.
+7. Recheck affected responses, confirm the complete scope, then record fresh
+   approvals separately. Missing/conflicting evidence blocks linked approval.
+   Asserted means owner assertion; it never automatically approves a response.
 
 The synthetic two-page example can demonstrate selective expiration: map response
 page 1 only to tender page 1, page 2 only to tender page 2, and the synthetic deadline
@@ -94,5 +100,13 @@ See [Token Factory feasibility](docs/TOKEN_FACTORY.md) for unverified access nee
 and [domain contract](docs/DOMAIN_CONTRACT.md) for engine semantics. P0-A service
 contracts remain intact; the new API maps manual page candidates into them.
 
-Next proposed phase: offline correction/recheck and reviewed export, under a new
-bounded authorization. Builder Program approval and real inference remain pending.
+Correction API/tests and walkthrough evidence: docs/evidence/P0B_CORRECTION_RECHECK.md.
+Run focused correction checks with:
+`python -m pytest -q backend/tests/test_evidence_api.py backend/tests/test_workflow_api.py::test_upload_amend_review_and_gate_vertical_slice backend/tests/test_engine.py::test_evidence_revisions_preserve_history_and_require_recheck`.
+With the two local servers running, `python frontend/tests/correction_browser.py`
+verifies the offline correction/recheck path using the existing Playwright setup.
+
+Next proposed slice: persistent local-session recovery before reviewed export,
+under further authorization. User reports Nebius onboarding blocked because Nigeria
+is absent from the billing-country list; Builder Program review and promotional
+credits remain pending. Real inference stays disabled and unverified.
